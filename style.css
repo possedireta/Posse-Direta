@@ -1,0 +1,331 @@
+/* ================= RESET E VARIÁVEIS ================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+:root {
+    /* Paleta de cores CLARA - Posse Direta */
+    --bg-main: #ffffff; /* Fundo branco puro */
+    --bg-secondary: #f4f6f8; /* Cinza bem claro para destacar os cards do fundo */
+    --primary: #c29b46; /* Dourado exato da logo */
+    --primary-hover: #a58137; /* Dourado mais escuro para hover */
+    --navy: #111a28; /* Azul marinho escuro da logo para os textos principais */
+    --text-muted: #475569; /* Cinza para textos secundários */
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--navy);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ================= BARRA DE URGÊNCIA ================= */
+.urgency-bar {
+    background-color: #ef4444; 
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.urgency-bar span {
+    background: rgba(0,0,0,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background: #ffffff;
+    border-bottom: 2px solid var(--primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Sombra leve para destacar a navbar */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    text-decoration: none; 
+}
+
+.logo img {
+    max-height: 45px;
+    width: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover img {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 22px; 
+    font-weight: 900;
+    color: var(--navy); 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.logo-text span {
+    color: var(--primary); 
+}
+
+.btn-login {
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+    border: 2px solid var(--primary);
+    padding: 8px 24px;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.btn-login:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* ================= HERO SECTION ================= */
+.hero {
+    text-align: center;
+    padding: 100px 5% 80px;
+    /* Fundo branco transparente por cima da imagem de fundo */
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), var(--bg-main)),
+                url('https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--navy);
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    color: var(--text-muted);
+}
+
+.cta-button {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff; 
+    text-decoration: none;
+    padding: 20px 45px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(194, 155, 70, 0.4);
+    transition: transform 0.2s, background 0.3s;
+    animation: pulse 2s infinite;
+}
+
+.cta-button:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(194, 155, 70, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(194, 155, 70, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(194, 155, 70, 0); }
+}
+
+/* ================= FEATURES GRID ================= */
+.features {
+    padding: 80px 5%;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+    color: var(--navy);
+}
+
+.section-title span {
+    color: var(--primary);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--bg-secondary);
+    padding: 40px 30px;
+    border-radius: 12px;
+    border-bottom: 4px solid var(--primary);
+    text-align: left;
+    transition: transform 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--navy);
+}
+
+.card p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* ================= PRICING ================= */
+.pricing {
+    background: var(--navy); /* Fundo azul marinho exclusivo nesta seção para destacar a oferta */
+    color: #fff;
+    text-align: center;
+    padding: 80px 5%;
+}
+
+.pricing h2 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.price-box {
+    background: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 50px 30px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    color: var(--navy);
+}
+
+.strike {
+    text-decoration: line-through;
+    color: #ef4444;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.price {
+    font-size: 4.5rem;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    margin: 15px 0;
+}
+
+.price span {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.price-box p {
+    margin-bottom: 30px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ================= FAQ ================= */
+.faq {
+    padding: 80px 5%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: #fff;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.faq-question {
+    padding: 20px 25px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    color: var(--navy);
+}
+
+.faq-question::after {
+    content: '+';
+    font-size: 1.5rem;
+    color: var(--primary);
+    transition: transform 0.3s;
+}
+
+.faq-item.active .faq-question::after {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    padding: 0 25px;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    color: var(--text-muted);
+}
+
+.faq-item.active .faq-answer {
+    padding: 0 25px 20px;
+    max-height: 300px;
+}
+
+/* ================= FOOTER ================= */
+footer {
+    background: #0b111a; 
+    text-align: center;
+    padding: 40px 5%;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .hero h1 { font-size: 2.5rem; }
+    .section-title { font-size: 2rem; }
+    .price { font-size: 3.5rem; }
+    .navbar { flex-direction: column; gap: 15px; }
+}
+
