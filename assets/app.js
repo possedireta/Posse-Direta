@@ -1,6 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
 
+
 const $ = id => document.getElementById(id);
 const configured = !SUPABASE_URL.startsWith("COLE_") && !SUPABASE_ANON_KEY.startsWith("COLE_");
 const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -293,7 +294,52 @@ function subjectPage() {
 }
 
 function materialCard(m) {
-    return `<article class="material-card ${isDone(m.id) ? "completed" : ""}"><div class="material-type-icon ${m.type}">${m.type === "pdf" ? "PDF" : m.type === "video" ? "▶" : "✓"}</div><div class="material-main"><h3>${esc(m.title)}</h3><p>${esc(m.description || "")}</p></div><div class="material-actions"><button class="fav-btn ${isFav(m.id) ? "active" : ""}" onclick="window.toggleFav('${m.id}',event)">☆</button><button class="complete-btn ${isDone(m.id) ? "active" : ""}" onclick="window.toggleDone('${m.id}',event)">✓</button><button class="btn primary small" onclick="window.openMaterial('${m.id}')">${m.type === "pdf" ? "Abrir" : m.type === "video" ? "Assistir" : "Responder"}</button></div></article>`;
+    let icon = "✓";
+    let action = "Responder";
+
+    if (m.type === "pdf") {
+        icon = "PDF";
+        action = "Abrir";
+    } else if (m.type === "html") {
+        icon = "HTML";
+        action = "Abrir";
+    } else if (m.type === "video") {
+        icon = "▶";
+        action = "Assistir";
+    }
+
+    return `
+        <article class="material-card ${isDone(m.id) ? "completed" : ""}">
+            <div class="material-type-icon ${m.type}">
+                ${icon}
+            </div>
+
+            <div class="material-main">
+                <h3>${esc(m.title)}</h3>
+                <p>${esc(m.description || "")}</p>
+            </div>
+
+            <div class="material-actions">
+                <button
+                    class="fav-btn ${isFav(m.id) ? "active" : ""}"
+                    onclick="window.toggleFav('${m.id}',event)">
+                    ☆
+                </button>
+
+                <button
+                    class="complete-btn ${isDone(m.id) ? "active" : ""}"
+                    onclick="window.toggleDone('${m.id}',event)">
+                    ✓
+                </button>
+
+                <button
+                    class="btn primary small"
+                    onclick="window.openMaterial('${m.id}')">
+                    ${action}
+                </button>
+            </div>
+        </article>
+    `;
 }
 
 window.toggleFav = async (id, e) => {
@@ -312,17 +358,61 @@ window.toggleDone = async (id, e) => {
 };
 
 window.openMaterial = async id => {
-    const m = cache.materials.find(x => x.id === id), s = subject(m?.subject_id), d = discipline(s?.contest_discipline_id);
-    if (!m || !d || !hasAccess(d.contest_id)) return toast("Acesso não autorizado.", "error");
-    activeMaterialId = id;
-    if (m.type === "pdf") {
-        const { data, error } = await supabase.storage.from("materials").createSignedUrl(m.storage_path, 600);
-        if (error) return toast(error.message, "error");
-        window.open(data.signedUrl, "_blank");
-    } else if (m.type === "video") openVideo(m);
-    else openQuiz(m);
-};
+    const m = cache.materials.find(x => x.id === id);
+    const s = subject(m?.subject_id);
+    const d = discipline(s?.contest_discipline_id);
 
+    if (!m || !d || !hasAccess(d.contest_id)) {
+        return toast("Acesso não autorizado.", "error");
+    }
+
+    activeMaterialId = id;
+
+    if (m.type === "pdf") {
+        const { data, error } = await supabase.storage
+            .from("materials")
+            .createSignedUrl(m.storage_path, 600);
+
+        if (error) return toast(error.message, "error");
+
+        window.open(data.signedUrl, "_blank");
+
+    } else if (m.type === "html") {
+
+        await openHtmlMaterial(m);
+
+    } else if (m.type === "video") {
+
+        openVideo(m);
+
+    } else if (m.type === "quiz") {
+
+        openQuiz(m);
+
+    }
+};
+async function openHtmlMaterial(m) {
+    if (!m.storage_path) {
+        return toast("Arquivo HTML não encontrado.", "error");
+    }
+
+    const { data, error } = await supabase.storage
+        .from("materials")
+        .createSignedUrl(m.storage_path, 600);
+
+    if (error) {
+        return toast(error.message, "error");
+    }
+
+    const r = await fetch(data.signedUrl);
+    const html = await r.text();
+
+    $("quizFrame").srcdoc = html;
+    $("quizViewerTitle").textContent = m.title;
+    $("quizViewer").classList.remove("hidden");
+
+    document.body.style.overflow = "hidden";
+}
 async function openQuiz(m) {
     if (m.storage_path) {
         const { data, error } = await supabase.storage.from("materials").createSignedUrl(m.storage_path, 600);
@@ -562,7 +652,12 @@ window.editSubject = id => {
 
 window.editMaterial = id => {
     const m = cache.materials.find(x => x.id === id) || {};
-    modal(id ? "Editar material" : "Novo material", `<form id="mForm" class="form"><label>Matéria</label><select id="mSubject" required><option value="">Selecione</option>${cache.subjects.map(s => { const d = discipline(s.contest_discipline_id); return `<option value="${s.id}" ${s.id === m.subject_id ? "selected" : ""}>${esc(contest(d?.contest_id)?.title || "")} — ${esc(d?.name || "")} — ${esc(s.name)}</option>` }).join("")}</select><div class="form-row"><div><label>Tipo</label><select id="mType"><option value="pdf" ${m.type === "pdf" ? "selected" : ""}>PDF</option><option value="video" ${m.type === "video" ? "selected" : ""}>Vídeo</option><option value="quiz" ${m.type === "quiz" ? "selected" : ""}>Questões HTML</option></select></div><div><label>Ordem</label><input id="mPos" type="number" value="${m.position ?? 0}"></div></div><label>Título</label><input id="mTitle" required value="${esc(m.title || "")}"><label>Descrição</label><textarea id="mDesc">${esc(m.description || "")}</textarea><div id="fileArea"><label>Arquivo</label><input id="mFile" type="file" accept=".pdf,.html,.htm"></div><div id="urlArea"><label>Link externo</label><input id="mUrl" type="url" value="${esc(m.external_url || "")}"></div><div id="simulatorArea" class="check-row"><input id="mSimulator" type="checkbox" ${m.is_simulator ? "checked" : ""}><label for="mSimulator">Exibir na área de simulados deste concurso</label></div><button class="btn primary">Salvar</button></form>`);
+    modal(id ? "Editar material" : "Novo material", `<form id="mForm" class="form"><label>Matéria</label><select id="mSubject" required><option value="">Selecione</option>${cache.subjects.map(s => { const d = discipline(s.contest_discipline_id); return `<option value="${s.id}" ${s.id === m.subject_id ? "selected" : ""}>${esc(contest(d?.contest_id)?.title || "")} — ${esc(d?.name || "")} — ${esc(s.name)}</option>` }).join("")}</select><div class="form-row"><div><label>Tipo</label><select id="mType">
+    <option value="pdf" ${m.type === "pdf" ? "selected" : ""}>PDF</option>
+    <option value="html" ${m.type === "html" ? "selected" : ""}>Material HTML</option>
+    <option value="video" ${m.type === "video" ? "selected" : ""}>Vídeo</option>
+    <option value="quiz" ${m.type === "quiz" ? "selected" : ""}>Questões HTML</option>
+</select></div><div><label>Ordem</label><input id="mPos" type="number" value="${m.position ?? 0}"></div></div><label>Título</label><input id="mTitle" required value="${esc(m.title || "")}"><label>Descrição</label><textarea id="mDesc">${esc(m.description || "")}</textarea><div id="fileArea"><label>Arquivo</label><input id="mFile" type="file" accept=".pdf,.html,.htm"></div><div id="urlArea"><label>Link externo</label><input id="mUrl" type="url" value="${esc(m.external_url || "")}"></div><div id="simulatorArea" class="check-row"><input id="mSimulator" type="checkbox" ${m.is_simulator ? "checked" : ""}><label for="mSimulator">Exibir na área de simulados deste concurso</label></div><button class="btn primary">Salvar</button></form>`);
     const sync = () => { $("fileArea").classList.toggle("hidden", $("mType").value === "video"); $("urlArea").classList.toggle("hidden", $("mType").value !== "video"); $("simulatorArea").classList.toggle("hidden", $("mType").value !== "quiz"); };
     $("mType").onchange = sync;
     sync();
