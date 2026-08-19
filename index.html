@@ -1,58 +1,312 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f1f3a"><title>Posse Direta Concursos</title><link rel="icon" href="assets/logo-pd.png"><link rel="stylesheet" href="assets/style.css"></head><body>
-<div id="toast" class="toast"></div>
-<section id="authView" class="auth-view"><div class="auth-brand-panel"><img src="assets/logo-posse-direta.jpeg" class="auth-logo" alt="Posse Direta Concursos"><div class="auth-brand-copy"><span class="eyebrow light">PREPARAÇÃO DIRECIONADA</span><h1>Escolha seu concurso.<br>Estude exatamente o que precisa.</h1><p>Cada concurso possui uma área exclusiva, com disciplinas, matérias, PDFs, videoaulas e questões.</p><div class="auth-benefits"><span>✓ Conteúdo por concurso</span><span>✓ Acesso individual</span><span>✓ Progresso do aluno</span></div></div></div><div class="auth-form-panel"><div class="auth-card"><div class="mobile-auth-logo"><img src="assets/logo-pd.png"><strong>Posse Direta</strong></div><div class="auth-tabs"><button id="loginTab" class="auth-tab active">Entrar</button><button id="signupTab" class="auth-tab">Criar conta</button></div><form id="loginForm" class="form"><div class="form-heading"><h2>Acesse sua conta</h2><p>Entre para acessar seus concursos.</p></div><label>E-mail</label><input id="loginEmail" type="email" required><label>Senha</label><input id="loginPassword" type="password" required minlength="6"><button class="btn primary wide">Entrar</button><button id="forgotBtn" class="text-button" type="button">Esqueci minha senha</button><div class="free-auth-divider"><span>acesso gratuito</span></div><button id="publicFreeBtn" class="btn free wide" type="button">🎯 Resolver 10 questões grátis de hoje</button></form><form id="signupForm" class="form hidden"><div class="form-heading"><h2>Crie sua conta</h2><p>O cadastro é gratuito. Você compra apenas o concurso que quiser.</p></div><label>Nome completo</label><input id="signupName" required><label>E-mail</label><input id="signupEmail" type="email" required><label>Senha</label><input id="signupPassword" type="password" required minlength="6"><button class="btn primary wide">Criar conta</button></form></div></div></section>
-<section id="appView" class="app-shell hidden"><div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div><aside class="app-sidebar"><button class="side-brand" data-nav="home"><img src="assets/logo-pd-fb.png"><div><strong>Posse Direta</strong><small>Concursos</small></div></button><nav class="side-nav"><button data-nav="home" class="active"><span>⌂</span> Início</button><button data-nav="catalog"><span>▦</span> Concursos</button><button data-nav="mycontests"><span>✓</span> Meus concursos</button><button data-nav="free"><span>🎯</span> Questões grátis</button><button data-nav="favorites"><span>☆</span> Favoritos</button><button data-nav="progress"><span>◔</span> Progresso</button><button data-nav="profile"><span>○</span> Perfil</button></nav><div class="sidebar-bottom"><button id="adminButton" class="admin-entry hidden"><span>⚙</span> Painel administrativo</button><button id="logoutButton" class="logout-entry"><span>↪</span> Sair</button></div></aside><div class="app-main"><header class="app-topbar"><button id="mobileMenuBtn" class="mobile-menu-btn">☰</button><div class="global-search"><span>⌕</span><input id="searchInput" placeholder="Buscar concurso ou matéria..."></div><div class="topbar-actions"><div class="user-chip"><div id="userInitials" class="avatar">PD</div><div class="user-chip-text"><strong id="userName">Aluno</strong><small>Aluno Posse Direta</small></div></div></div></header><main id="mainContent" class="content"></main></div><nav class="mobile-bottom-nav"><button data-nav="home" class="active"><span>⌂</span><small>Início</small></button><button data-nav="catalog"><span>▦</span><small>Concursos</small></button><button data-nav="mycontests"><span>✓</span><small>Meus</small></button><button data-nav="free"><span>🎯</span><small>Grátis</small></button><button data-nav="progress"><span>◔</span><small>Progresso</small></button><button data-nav="profile"><span>○</span><small>Perfil</small></button></nav></section>
-<section id="freeView" class="free-public-view hidden"><header class="free-public-topbar"><button id="freeBackBtn" class="btn secondary">← Voltar</button><div class="viewer-brand"><img src="assets/logo-pd.png"><div><strong>Posse Direta</strong><small>Questões gratuitas do dia</small></div></div><button id="freeLoginBtn" class="btn primary">Entrar / Criar conta</button></header><main class="free-public-main"><section class="free-hero"><span class="eyebrow light">TODO DIA TEM CONTEÚDO NOVO</span><h1>10 questões gratuitas por dia</h1><p>Treine gratuitamente, confira seu resultado ao final e conheça o método Posse Direta.</p></section><div id="freeQuestionsContent"></div></main></section>
-<section id="adminView" class="admin-shell hidden"><aside class="admin-sidebar"><div class="admin-brand"><img src="assets/logo-pd.png"><div><strong>Posse Direta</strong><small>Painel Administrativo</small></div></div><nav><button data-admin="dashboard" class="active">Visão geral</button><button data-admin="contests">Concursos</button><button data-admin="disciplines">Disciplinas</button><button data-admin="subjects">Matérias</button><button data-admin="materials">Materiais</button><button data-admin="dailyquestions">Questões grátis</button><button data-admin="access">Acessos</button><button data-admin="purchases">Pagamentos</button><button data-admin="users">Usuários</button></nav><div class="admin-sidebar-bottom"><button id="backToSite">← Voltar ao site</button><button id="adminLogout">Sair</button></div></aside><div class="admin-main"><header class="admin-topbar"><div><span class="eyebrow dark">Administração</span><h2 id="adminPageTitle">Visão geral</h2></div></header><main id="adminContent" class="admin-content"></main></div></section>
-<div id="modal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Editar</h3><button id="modalClose" class="modal-close">×</button></div><div id="modalBody"></div></div></div>
-<div id="quizViewer" class="quiz-viewer hidden"><div class="viewer-topbar"><button id="closeQuizViewer" class="btn secondary">← Voltar</button><div class="viewer-brand"><img src="assets/logo-pd.png"><strong id="quizViewerTitle">Questões</strong></div><button id="markQuizComplete" class="btn primary">Marcar como concluído</button></div><iframe id="quizFrame" class="quiz-frame" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe></div>
-<div id="videoViewer" class="media-viewer hidden"><div class="media-viewer-card"><div class="modal-head"><h3 id="videoTitle">Videoaula</h3><button id="closeVideoViewer" class="modal-close">×</button></div><div class="video-ratio"><iframe id="videoFrame" allowfullscreen></iframe></div><button id="markVideoComplete" class="btn primary wide">Marcar aula como concluída</button></div></div>
-<script type="module" src="assets/app.js"></script>
-<!-- PIX DIRETO -->
-<div id="pixViewer" class="media-viewer hidden">
-  <div class="media-viewer-card pix-card">
-    <div class="modal-head">
-      <div>
-        <span class="eyebrow dark">PIX MERCADO PAGO</span>
-        <h3 id="pixTitle">Pagar com Pix</h3>
-      </div>
-      <button id="closePixViewer" class="modal-close">×</button>
-    </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#0f1f3a">
+    <title>Posse Direta Concursos</title>
+    <link rel="icon" href="assets/logo-pd.png">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
 
-    <div id="pixLoading" class="pix-loading">
-      <div class="pix-spinner"></div>
-      <strong>Gerando seu Pix...</strong>
-      <p>Aguarde alguns segundos.</p>
-    </div>
+    <!-- NOTIFICAÇÕES (TOAST) -->
+    <div id="toast" class="toast"></div>
 
-    <div id="pixContent" class="hidden">
-      <div class="pix-status waiting" id="pixStatus">Aguardando pagamento</div>
-      <div class="pix-layout">
-        <div class="pix-qr-wrap">
-          <img id="pixQrImage" class="pix-qr" alt="QR Code Pix">
+    <!-- ========================================== -->
+    <!-- 1. TELA DE LOGIN / CADASTRO -->
+    <!-- ========================================== -->
+    <section id="authView" class="auth-view">
+        <div class="auth-brand-panel">
+            <img src="assets/logo-posse-direta.jpeg" class="auth-logo" alt="Posse Direta Concursos">
+            <div class="auth-brand-copy">
+                <span class="eyebrow light">PREPARAÇÃO DIRECIONADA</span>
+                <h1>Escolha seu concurso.<br>Estude exatamente o que precisa.</h1>
+                <p>Cada concurso possui uma área exclusiva, com disciplinas, matérias, PDFs, videoaulas e questões.</p>
+                <div class="auth-benefits">
+                    <span>✓ Conteúdo por concurso</span>
+                    <span>✓ Acesso individual</span>
+                    <span>✓ Progresso do aluno</span>
+                </div>
+            </div>
         </div>
-        <div class="pix-instructions">
-          <h3>Escaneie o QR Code</h3>
-          <p>Abra o aplicativo do seu banco, escolha Pix e escaneie o código.</p>
-          <div class="pix-divider"><span>ou</span></div>
-          <label>Pix Copia e Cola</label>
-          <div class="pix-copy-row">
-            <input id="pixCopyCode" readonly>
-            <button id="copyPixBtn" class="btn secondary" type="button">Copiar</button>
-          </div>
-          <button id="openPixTicket" class="btn ghost wide hidden" type="button">Abrir instruções do Mercado Pago</button>
-          <p class="pix-help">Assim que o Mercado Pago confirmar o pagamento, o concurso será liberado automaticamente.</p>
+        
+        <div class="auth-form-panel">
+            <div class="auth-card">
+                <div class="mobile-auth-logo">
+                    <img src="assets/logo-pd.png">
+                    <strong>Posse Direta</strong>
+                </div>
+                <div class="auth-tabs">
+                    <button id="loginTab" class="auth-tab active">Entrar</button>
+                    <button id="signupTab" class="auth-tab">Criar conta</button>
+                </div>
+                
+                <!-- Formulário de Login -->
+                <form id="loginForm" class="form">
+                    <div class="form-heading">
+                        <h2>Acesse sua conta</h2>
+                        <p>Entre para acessar seus concursos.</p>
+                    </div>
+                    <label>E-mail</label>
+                    <input id="loginEmail" type="email" required>
+                    
+                    <label>Senha</label>
+                    <input id="loginPassword" type="password" required minlength="6">
+                    
+                    <button class="btn primary wide">Entrar</button>
+                    <button id="forgotBtn" class="text-button" type="button">Esqueci minha senha</button>
+                    
+                    <div class="free-auth-divider"><span>acesso gratuito</span></div>
+                    <button id="publicFreeBtn" class="btn free wide" type="button">🎯 Resolver 10 questões grátis de hoje</button>
+                </form>
+
+                <!-- Formulário de Cadastro -->
+                <form id="signupForm" class="form hidden">
+                    <div class="form-heading">
+                        <h2>Crie sua conta</h2>
+                        <p>O cadastro é gratuito. Você compra apenas o concurso que quiser.</p>
+                    </div>
+                    <label>Nome completo</label>
+                    <input id="signupName" required>
+                    
+                    <label>E-mail</label>
+                    <input id="signupEmail" type="email" required>
+                    
+                    <label>Senha</label>
+                    <input id="signupPassword" type="password" required minlength="6">
+                    
+                    <button class="btn primary wide">Criar conta</button>
+                </form>
+            </div>
         </div>
-      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 2. ÁREA DO ALUNO (APP PRINCIPAL) -->
+    <!-- ========================================== -->
+    <section id="appView" class="app-shell hidden">
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div>
+        
+        <!-- Menu Lateral -->
+        <aside class="app-sidebar">
+            <button class="side-brand" data-nav="home">
+                <img src="assets/logo-pd-fb.png">
+                <div>
+                    <strong>Posse Direta</strong>
+                    <small>Concursos</small>
+                </div>
+            </button>
+            <nav class="side-nav">
+                <button data-nav="home" class="active"><span>⌂</span> Início</button>
+                <button data-nav="catalog"><span>▦</span> Concursos</button>
+                <button data-nav="mycontests"><span>✓</span> Meus concursos</button>
+                <button data-nav="free"><span>🎯</span> Questões grátis</button>
+                <button data-nav="favorites"><span>☆</span> Favoritos</button>
+                <button data-nav="progress"><span>◔</span> Progresso</button>
+                <button data-nav="profile"><span>○</span> Perfil</button>
+            </nav>
+            <div class="sidebar-bottom">
+                <button id="adminButton" class="admin-entry hidden"><span>⚙</span> Painel administrativo</button>
+                <button id="logoutButton" class="logout-entry"><span>↪</span> Sair</button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <div class="app-main">
+            <header class="app-topbar">
+                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+                <div class="global-search">
+                    <span>⌕</span>
+                    <input id="searchInput" placeholder="Buscar concurso ou matéria...">
+                </div>
+                <div class="topbar-actions">
+                    <div class="user-chip">
+                        <div id="userInitials" class="avatar">PD</div>
+                        <div class="user-chip-text">
+                            <strong id="userName">Aluno</strong>
+                            <small>Aluno Posse Direta</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <main id="mainContent" class="content"></main>
+        </div>
+
+        <!-- Menu Inferior Mobile -->
+        <nav class="mobile-bottom-nav">
+            <button data-nav="home" class="active"><span>⌂</span><small>Início</small></button>
+            <button data-nav="catalog"><span>▦</span><small>Concursos</small></button>
+            <button data-nav="mycontests"><span>✓</span><small>Meus</small></button>
+            <button data-nav="free"><span>🎯</span><small>Grátis</small></button>
+            <button data-nav="progress"><span>◔</span><small>Progresso</small></button>
+            <button data-nav="profile"><span>○</span><small>Perfil</small></button>
+        </nav>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 3. QUESTÕES GRATUITAS DIÁRIAS -->
+    <!-- ========================================== -->
+    <section id="freeView" class="free-public-view hidden">
+        <header class="free-public-topbar">
+            <button id="freeBackBtn" class="btn secondary">← Voltar</button>
+            <div class="viewer-brand">
+                <img src="assets/logo-pd.png">
+                <div>
+                    <strong>Posse Direta</strong>
+                    <small>Questões gratuitas do dia</small>
+                </div>
+            </div>
+            <button id="freeLoginBtn" class="btn primary">Entrar / Criar conta</button>
+        </header>
+        <main class="free-public-main">
+            <section class="free-hero">
+                <span class="eyebrow light">TODO DIA TEM CONTEÚDO NOVO</span>
+                <h1>10 questões gratuitas por dia</h1>
+                <p>Treine gratuitamente, confira seu resultado ao final e conheça o método Posse Direta.</p>
+            </section>
+            <div id="freeQuestionsContent"></div>
+        </main>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 4. PAINEL DE ADMINISTRAÇÃO -->
+    <!-- ========================================== -->
+    <section id="adminView" class="admin-shell hidden">
+        <aside class="admin-sidebar">
+            <div class="admin-brand">
+                <img src="assets/logo-pd.png">
+                <div>
+                    <strong>Posse Direta</strong>
+                    <small>Painel Administrativo</small>
+                </div>
+            </div>
+            <nav>
+                <button data-admin="dashboard" class="active">Visão geral</button>
+                <button data-admin="contests">Concursos</button>
+                <button data-admin="disciplines">Disciplinas</button>
+                <button data-admin="subjects">Matérias</button>
+                <button data-admin="materials">Materiais</button>
+                <button data-admin="dailyquestions">Questões grátis</button>
+                <button data-admin="access">Acessos</button>
+                <button data-admin="purchases">Pagamentos</button>
+                <button data-admin="users">Usuários</button>
+            </nav>
+            <div class="admin-sidebar-bottom">
+                <button id="backToSite">← Voltar ao site</button>
+                <button id="adminLogout">Sair</button>
+            </div>
+        </aside>
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div>
+                    <span class="eyebrow dark">Administração</span>
+                    <h2 id="adminPageTitle">Visão geral</h2>
+                </div>
+            </header>
+            <main id="adminContent" class="admin-content"></main>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 5. MODAIS E VISUALIZADORES -->
+    <!-- ========================================== -->
+    
+    <!-- Modal Genérico (Usado no Admin) -->
+    <div id="modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 id="modalTitle">Editar</h3>
+                <button id="modalClose" class="modal-close">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
     </div>
 
-    <div id="pixSuccess" class="hidden pix-success">
-      <div class="pix-success-icon">✓</div>
-      <h2>Pagamento confirmado!</h2>
-      <p>Seu acesso ao concurso foi liberado.</p>
-      <button id="pixSuccessClose" class="btn primary wide">Entrar no concurso</button>
+    <!-- Visualizador de Questões HTML -->
+    <div id="quizViewer" class="quiz-viewer hidden">
+        <div class="viewer-topbar">
+            <button id="closeQuizViewer" class="btn secondary">← Voltar</button>
+            <div class="viewer-brand">
+                <img src="assets/logo-pd.png">
+                <strong id="quizViewerTitle">Questões</strong>
+            </div>
+            <button id="markQuizComplete" class="btn primary">Marcar como concluído</button>
+        </div>
+        <iframe id="quizFrame" class="quiz-frame" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
     </div>
-  </div>
-</div>
 
-</body></html>
+    <!-- Visualizador de Vídeos -->
+    <div id="videoViewer" class="media-viewer hidden">
+        <div class="media-viewer-card">
+            <div class="modal-head">
+                <h3 id="videoTitle">Videoaula</h3>
+                <button id="closeVideoViewer" class="modal-close">×</button>
+            </div>
+            <div class="video-ratio">
+                <iframe id="videoFrame" allowfullscreen></iframe>
+            </div>
+            <button id="markVideoComplete" class="btn primary wide">Marcar aula como concluída</button>
+        </div>
+    </div>
+
+    <!-- Script Principal -->
+    <script type="module" src="assets/app.js"></script>
+
+    <!-- ========================================== -->
+    <!-- 6. MODAL DE PAGAMENTO PIX DIRETO -->
+    <!-- ========================================== -->
+    <div id="pixViewer" class="media-viewer hidden">
+        <div class="media-viewer-card pix-card">
+            <div class="modal-head">
+                <div>
+                    <span class="eyebrow dark">PIX MERCADO PAGO</span>
+                    <h3 id="pixTitle">Pagar com Pix</h3>
+                </div>
+                <button id="closePixViewer" class="modal-close">×</button>
+            </div>
+
+            <!-- Estado: Carregando -->
+            <div id="pixLoading" class="pix-loading">
+                <div class="pix-spinner"></div>
+                <strong>Gerando seu Pix...</strong>
+                <p>Aguarde alguns segundos.</p>
+            </div>
+
+            <!-- Estado: Exibindo QR Code -->
+            <div id="pixContent" class="hidden">
+                <div class="pix-status waiting" id="pixStatus">Aguardando pagamento</div>
+                <div class="pix-layout">
+                    <div class="pix-qr-wrap">
+                        <img id="pixQrImage" class="pix-qr" alt="QR Code Pix">
+                    </div>
+                    <div class="pix-instructions">
+                        <h3>Escaneie o QR Code</h3>
+                        <p>Abra o aplicativo do seu banco, escolha Pix e escaneie o código.</p>
+                        
+                        <div class="pix-divider"><span>ou</span></div>
+                        
+                        <label>Pix Copia e Cola</label>
+                        <div class="pix-copy-row">
+                            <input id="pixCopyCode" readonly>
+                            <button id="copyPixBtn" class="btn secondary" type="button">Copiar</button>
+                        </div>
+                        
+                        <button id="openPixTicket" class="btn ghost wide hidden" type="button">Abrir instruções do Mercado Pago</button>
+                        <p class="pix-help">Assim que o Mercado Pago confirmar o pagamento, o concurso será liberado automaticamente.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado: Pagamento Aprovado -->
+            <div id="pixSuccess" class="hidden pix-success">
+                <div class="pix-success-icon">✓</div>
+                <h2>Pagamento confirmado!</h2>
+                <p>Seu acesso ao concurso foi liberado.</p>
+                <button id="pixSuccessClose" class="btn primary wide">Entrar no concurso</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
