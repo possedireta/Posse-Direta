@@ -301,7 +301,7 @@ function materialCard(m) {
         icon = "PDF";
         action = "Abrir";
     } else if (m.type === "html") {
-        icon = "HTML";
+        icon = "Aula";
         action = "Abrir";
     } else if (m.type === "video") {
         icon = "▶";
