@@ -49,7 +49,7 @@ insert into storage.buckets(id,name,public) values('materials','materials',false
 create policy "storage protected read" on storage.objects for select to authenticated using(bucket_id='materials' and (public.is_admin() or exists(select 1 from public.materials m join public.subjects s on s.id=m.subject_id join public.contest_disciplines d on d.id=s.contest_discipline_id where m.storage_path=storage.objects.name and public.has_contest_access(d.contest_id))));
 create policy "storage admin insert" on storage.objects for insert to authenticated with check(bucket_id='materials' and public.is_admin());create policy "storage admin update" on storage.objects for update to authenticated using(bucket_id='materials' and public.is_admin()) with check(bucket_id='materials' and public.is_admin());create policy "storage admin delete" on storage.objects for delete to authenticated using(bucket_id='materials' and public.is_admin());
 -- depois do seu cadastro: update public.profiles set role='admin' where email='SEU_EMAIL';
-
+update public.profiles set role='admin' where email='possedireta@gmail.com';
 
 -- PIX DIRETO (Orders API)
 alter table public.purchases add column if not exists provider_order_id text;
