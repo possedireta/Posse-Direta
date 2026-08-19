@@ -3267,3 +3267,46 @@ textarea {
         min-height: 600px;
     }
 }
+
+/* ================= BOTÃO DO WHATSAPP ================= */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: #25d366; /* Verde oficial do WhatsApp */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    z-index: 1000; /* Garante que fique por cima de tudo */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.1); /* Dá um zoom quando passa o mouse */
+    background-color: #20b858; /* Fica um verde um pouco mais escuro */
+}
+
+.whatsapp-btn img {
+    width: 35px;
+    height: 35px;
+    /* brightness(0) deixa tudo preto, invert(1) transforma o preto em branco */
+    filter: brightness(0) invert(1); 
+}
+
+/* Ajuste para telas menores (Celular) */
+@media (max-width: 620px) {
+    .whatsapp-btn {
+        bottom: 85px; /* Sobe um pouco no celular para não ficar em cima do menu inferior */
+        right: 15px;
+        width: 55px;
+        height: 55px;
+    }
+    .whatsapp-btn img {
+        width: 30px;
+        height: 30px;
+    }
+}
