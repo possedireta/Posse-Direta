@@ -562,17 +562,342 @@ function adminContests() {
 }
 
 function adminDisciplines() {
-    $("adminContent").innerHTML = header("Disciplinas", `<button class="btn primary" onclick="window.editDiscipline()">+ Nova disciplina</button>`) + table(["Disciplina", "Concurso", "Ordem", "Ações"], cache.disciplines.map(d => [`<strong>${esc(d.name)}</strong>`, esc(contest(d.contest_id)?.title || ""), d.position, acts(`window.editDiscipline('${d.id}')`, `window.del('contest_disciplines','${d.id}')`)]));
-}
+    const contestOptions = cache.contests.map(c =>
+        `<option value="${c.id}">${esc(c.title)}</option>`
+    ).join("");
 
+    $("adminContent").innerHTML =
+        header(
+            "Disciplinas",
+            `<button class="btn primary" onclick="window.editDiscipline()">+ Nova disciplina</button>`
+        ) +
+        `
+        <div class="admin-section">
+            <label>Filtrar por concurso</label>
+            <select id="disciplineContestFilter">
+                <option value="">Todos os concursos</option>
+                ${contestOptions}
+            </select>
+        </div>
+
+        <div id="disciplinesTable"></div>
+        `;
+
+    const renderTable = () => {
+        const contestId = $("disciplineContestFilter").value;
+
+        const filtered = contestId
+            ? cache.disciplines.filter(d => d.contest_id === contestId)
+            : cache.disciplines;
+
+        $("disciplinesTable").innerHTML = table(
+            ["Disciplina", "Concurso", "Ordem", "Ações"],
+            filtered.map(d => [
+                `<strong>${esc(d.name)}</strong>`,
+                esc(contest(d.contest_id)?.title || ""),
+                d.position,
+                acts(
+                    `window.editDiscipline('${d.id}')`,
+                    `window.del('contest_disciplines','${d.id}')`
+                )
+            ])
+        );
+    };
+
+    $("disciplineContestFilter").onchange = renderTable;
+
+    renderTable();
+}
 function adminSubjects() {
-    $("adminContent").innerHTML = header("Matérias", `<button class="btn primary" onclick="window.editSubject()">+ Nova matéria</button>`) + table(["Matéria", "Disciplina", "Concurso", "Ações"], cache.subjects.map(s => { const d = discipline(s.contest_discipline_id); return [`<strong>${esc(s.name)}</strong>`, esc(d?.name || ""), esc(contest(d?.contest_id)?.title || ""), acts(`window.editSubject('${s.id}')`, `window.del('subjects','${s.id}')`)] }));
-}
+    const contestOptions = cache.contests.map(c =>
+        `<option value="${c.id}">${esc(c.title)}</option>`
+    ).join("");
 
+    $("adminContent").innerHTML =
+        header(
+            "Matérias",
+            `<button class="btn primary" onclick="window.editSubject()">+ Nova matéria</button>`
+        ) +
+        `
+        <div class="admin-section">
+            <div class="form-row">
+
+                <div>
+                    <label>Concurso</label>
+                    <select id="subjectContestFilter">
+                        <option value="">Todos os concursos</option>
+                        ${contestOptions}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Disciplina</label>
+                    <select id="subjectDisciplineFilter">
+                        <option value="">Todas as disciplinas</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="subjectsTable"></div>
+        `;
+
+    const updateDisciplineOptions = () => {
+        const contestId = $("subjectContestFilter").value;
+
+        const disciplines = contestId
+            ? cache.disciplines.filter(d => d.contest_id === contestId)
+            : cache.disciplines;
+
+        $("subjectDisciplineFilter").innerHTML =
+            `<option value="">Todas as disciplinas</option>` +
+            disciplines.map(d =>
+                `<option value="${d.id}">${esc(d.name)}</option>`
+            ).join("");
+    };
+
+    const renderTable = () => {
+        const contestId = $("subjectContestFilter").value;
+        const disciplineId = $("subjectDisciplineFilter").value;
+
+        let filtered = cache.subjects;
+
+        if (contestId) {
+            const disciplineIds = cache.disciplines
+                .filter(d => d.contest_id === contestId)
+                .map(d => d.id);
+
+            filtered = filtered.filter(s =>
+                disciplineIds.includes(s.contest_discipline_id)
+            );
+        }
+
+        if (disciplineId) {
+            filtered = filtered.filter(
+                s => s.contest_discipline_id === disciplineId
+            );
+        }
+
+        $("subjectsTable").innerHTML = table(
+            ["Matéria", "Disciplina", "Concurso", "Ações"],
+            filtered.map(s => {
+                const d = discipline(s.contest_discipline_id);
+
+                return [
+                    `<strong>${esc(s.name)}</strong>`,
+                    esc(d?.name || ""),
+                    esc(contest(d?.contest_id)?.title || ""),
+                    acts(
+                        `window.editSubject('${s.id}')`,
+                        `window.del('subjects','${s.id}')`
+                    )
+                ];
+            })
+        );
+    };
+
+    $("subjectContestFilter").onchange = () => {
+        updateDisciplineOptions();
+        renderTable();
+    };
+
+    $("subjectDisciplineFilter").onchange = renderTable;
+
+    updateDisciplineOptions();
+    renderTable();
+}
 function adminMaterials() {
-    $("adminContent").innerHTML = header("Materiais", `<button class="btn primary" onclick="window.editMaterial()">+ Novo material</button>`) + table(["Título", "Tipo", "Matéria", "Ações"], cache.materials.map(m => [`<strong>${esc(m.title)}</strong>`, (m.type === "quiz" && m.is_simulator) ? "Simulado" : m.type, esc(subject(m.subject_id)?.name || ""), acts(`window.editMaterial('${m.id}')`, `window.deleteMaterial('${m.id}')`)]));
-}
+    const contestOptions = cache.contests.map(c =>
+        `<option value="${c.id}">${esc(c.title)}</option>`
+    ).join("");
 
+    $("adminContent").innerHTML =
+        header(
+            "Materiais",
+            `<button class="btn primary" onclick="window.editMaterial()">+ Novo material</button>`
+        ) +
+        `
+        <div class="admin-section">
+
+            <div class="form-row">
+
+                <div>
+                    <label>Concurso</label>
+                    <select id="materialContestFilter">
+                        <option value="">Todos os concursos</option>
+                        ${contestOptions}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Disciplina</label>
+                    <select id="materialDisciplineFilter">
+                        <option value="">Todas as disciplinas</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div>
+                    <label>Matéria</label>
+                    <select id="materialSubjectFilter">
+                        <option value="">Todas as matérias</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Buscar material</label>
+                    <input
+                        id="materialSearch"
+                        type="text"
+                        placeholder="Digite o nome do material..."
+                    >
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="materialsTable"></div>
+        `;
+
+    const updateDisciplines = () => {
+        const contestId = $("materialContestFilter").value;
+
+        const disciplines = contestId
+            ? cache.disciplines.filter(d => d.contest_id === contestId)
+            : cache.disciplines;
+
+        $("materialDisciplineFilter").innerHTML =
+            `<option value="">Todas as disciplinas</option>` +
+            disciplines.map(d =>
+                `<option value="${d.id}">${esc(d.name)}</option>`
+            ).join("");
+    };
+
+    const updateSubjects = () => {
+        const contestId = $("materialContestFilter").value;
+        const disciplineId = $("materialDisciplineFilter").value;
+
+        let subjects = cache.subjects;
+
+        if (contestId) {
+            const ids = cache.disciplines
+                .filter(d => d.contest_id === contestId)
+                .map(d => d.id);
+
+            subjects = subjects.filter(s =>
+                ids.includes(s.contest_discipline_id)
+            );
+        }
+
+        if (disciplineId) {
+            subjects = subjects.filter(
+                s => s.contest_discipline_id === disciplineId
+            );
+        }
+
+        $("materialSubjectFilter").innerHTML =
+            `<option value="">Todas as matérias</option>` +
+            subjects.map(s =>
+                `<option value="${s.id}">${esc(s.name)}</option>`
+            ).join("");
+    };
+
+    const renderTable = () => {
+        const contestId = $("materialContestFilter").value;
+        const disciplineId = $("materialDisciplineFilter").value;
+        const subjectId = $("materialSubjectFilter").value;
+        const search = $("materialSearch").value
+            .trim()
+            .toLowerCase();
+
+        let filtered = cache.materials;
+
+        if (subjectId) {
+            filtered = filtered.filter(
+                m => m.subject_id === subjectId
+            );
+        } else if (disciplineId) {
+
+            const subjectIds = cache.subjects
+                .filter(s => s.contest_discipline_id === disciplineId)
+                .map(s => s.id);
+
+            filtered = filtered.filter(m =>
+                subjectIds.includes(m.subject_id)
+            );
+
+        } else if (contestId) {
+
+            const disciplineIds = cache.disciplines
+                .filter(d => d.contest_id === contestId)
+                .map(d => d.id);
+
+            const subjectIds = cache.subjects
+                .filter(s =>
+                    disciplineIds.includes(s.contest_discipline_id)
+                )
+                .map(s => s.id);
+
+            filtered = filtered.filter(m =>
+                subjectIds.includes(m.subject_id)
+            );
+        }
+
+        if (search) {
+            filtered = filtered.filter(m =>
+                (m.title || "").toLowerCase().includes(search)
+            );
+        }
+
+        $("materialsTable").innerHTML = table(
+            ["Título", "Tipo", "Matéria", "Disciplina", "Concurso", "Ações"],
+            filtered.map(m => {
+
+                const s = subject(m.subject_id);
+                const d = discipline(s?.contest_discipline_id);
+                const c = contest(d?.contest_id);
+
+                return [
+                    `<strong>${esc(m.title)}</strong>`,
+                    (m.type === "quiz" && m.is_simulator)
+                        ? "Simulado"
+                        : m.type,
+                    esc(s?.name || ""),
+                    esc(d?.name || ""),
+                    esc(c?.title || ""),
+                    acts(
+                        `window.editMaterial('${m.id}')`,
+                        `window.deleteMaterial('${m.id}')`
+                    )
+                ];
+            })
+        );
+    };
+
+    $("materialContestFilter").onchange = () => {
+        updateDisciplines();
+        updateSubjects();
+        renderTable();
+    };
+
+    $("materialDisciplineFilter").onchange = () => {
+        updateSubjects();
+        renderTable();
+    };
+
+    $("materialSubjectFilter").onchange = renderTable;
+
+    $("materialSearch").oninput = renderTable;
+
+    updateDisciplines();
+    updateSubjects();
+    renderTable();
+}
 function adminDailyQuestions() {
     $("adminContent").innerHTML = header("Questões grátis em HTML", `<button class="btn primary" onclick="window.editFreeQuiz()">+ Adicionar HTML</button>`) + `<div class="admin-section"><p class="help">Envie um arquivo HTML com as questões, no mesmo padrão dos arquivos usados nas matérias. O arquivo publicado para a data ficará acessível sem login e sem compra.</p></div>` + table(["Data", "Título", "Arquivo", "Status", "Ações"], cache.freeQuizzes.map(q => [fmtDate(q.publish_date), `<strong>${esc(q.title)}</strong>`, esc(q.storage_path || ""), q.is_published ? "Publicado" : "Oculto", acts(`window.editFreeQuiz('${q.id}')`, `window.deleteFreeQuiz('${q.id}')`)]));
 }
@@ -636,55 +961,530 @@ window.editDiscipline = id => {
 
 window.editSubject = id => {
     const s = subject(id) || {};
-    modal(id ? "Editar matéria" : "Nova matéria", `<form id="sForm" class="form"><label>Disciplina</label><select id="sDisc" required><option value="">Selecione</option>${cache.disciplines.map(d => `<option value="${d.id}" ${d.id === s.contest_discipline_id ? "selected" : ""}>${esc(contest(d.contest_id)?.title || "")} — ${esc(d.name)}</option>`).join("")}</select><label>Nome</label><input id="sName" required value="${esc(s.name || "")}"><label>Descrição</label><textarea id="sDesc">${esc(s.description || "")}</textarea><label>Ordem</label><input id="sPos" type="number" value="${s.position ?? 0}"><button class="btn primary">Salvar</button></form>`);
+
+    const currentDiscipline = s.contest_discipline_id
+        ? discipline(s.contest_discipline_id)
+        : null;
+
+    const currentContestId = currentDiscipline?.contest_id || "";
+
+    modal(
+        id ? "Editar matéria" : "Nova matéria",
+        `
+        <form id="sForm" class="form">
+
+            <label>Concurso</label>
+            <select id="sContest" required>
+                <option value="">Selecione o concurso</option>
+
+                ${cache.contests.map(c =>
+                    `<option
+                        value="${c.id}"
+                        ${c.id === currentContestId ? "selected" : ""}
+                    >
+                        ${esc(c.title)}
+                    </option>`
+                ).join("")}
+
+            </select>
+
+            <label>Disciplina</label>
+
+            <select id="sDisc" required>
+                <option value="">Selecione primeiro o concurso</option>
+            </select>
+
+            <label>Nome</label>
+            <input
+                id="sName"
+                required
+                value="${esc(s.name || "")}"
+            >
+
+            <label>Descrição</label>
+            <textarea id="sDesc">${esc(s.description || "")}</textarea>
+
+            <label>Ordem</label>
+            <input
+                id="sPos"
+                type="number"
+                value="${s.position ?? 0}"
+            >
+
+            <button class="btn primary">
+                Salvar
+            </button>
+
+        </form>
+        `
+    );
+
+    const loadDisciplines = () => {
+        const contestId = $("sContest").value;
+
+        const filtered = cache.disciplines.filter(
+            d => d.contest_id === contestId
+        );
+
+        $("sDisc").innerHTML =
+            `<option value="">Selecione a disciplina</option>` +
+            filtered.map(d =>
+                `<option
+                    value="${d.id}"
+                    ${d.id === s.contest_discipline_id ? "selected" : ""}
+                >
+                    ${esc(d.name)}
+                </option>`
+            ).join("");
+    };
+
+    $("sContest").onchange = loadDisciplines;
+
+    loadDisciplines();
+
     $("sForm").onsubmit = async e => {
         e.preventDefault();
-        const p = { contest_discipline_id: $("sDisc").value, name: $("sName").value.trim(), description: $("sDesc").value.trim(), position: Number($("sPos").value || 0), is_active: true };
-        const q = id ? supabase.from("subjects").update(p).eq("id", id) : supabase.from("subjects").insert(p);
+
+        const p = {
+            contest_discipline_id: $("sDisc").value,
+            name: $("sName").value.trim(),
+            description: $("sDesc").value.trim(),
+            position: Number($("sPos").value || 0),
+            is_active: true
+        };
+
+        const q = id
+            ? supabase
+                .from("subjects")
+                .update(p)
+                .eq("id", id)
+            : supabase
+                .from("subjects")
+                .insert(p);
+
         const { error } = await q;
-        if (error) return toast(error.message, "error");
+
+        if (error) {
+            return toast(error.message, "error");
+        }
+
         closeModal();
+
         await loadAdmin();
+
         renderAdmin();
+
         toast("Matéria salva.", "success");
     };
 };
-
 window.editMaterial = id => {
     const m = cache.materials.find(x => x.id === id) || {};
-    modal(id ? "Editar material" : "Novo material", `<form id="mForm" class="form"><label>Matéria</label><select id="mSubject" required><option value="">Selecione</option>${cache.subjects.map(s => { const d = discipline(s.contest_discipline_id); return `<option value="${s.id}" ${s.id === m.subject_id ? "selected" : ""}>${esc(contest(d?.contest_id)?.title || "")} — ${esc(d?.name || "")} — ${esc(s.name)}</option>` }).join("")}</select><div class="form-row"><div><label>Tipo</label><select id="mType">
-    <option value="pdf" ${m.type === "pdf" ? "selected" : ""}>PDF</option>
-    <option value="html" ${m.type === "html" ? "selected" : ""}>Material HTML</option>
-    <option value="video" ${m.type === "video" ? "selected" : ""}>Vídeo</option>
-    <option value="quiz" ${m.type === "quiz" ? "selected" : ""}>Questões HTML</option>
-</select></div><div><label>Ordem</label><input id="mPos" type="number" value="${m.position ?? 0}"></div></div><label>Título</label><input id="mTitle" required value="${esc(m.title || "")}"><label>Descrição</label><textarea id="mDesc">${esc(m.description || "")}</textarea><div id="fileArea"><label>Arquivo</label><input id="mFile" type="file" accept=".pdf,.html,.htm"></div><div id="urlArea"><label>Link externo</label><input id="mUrl" type="url" value="${esc(m.external_url || "")}"></div><div id="simulatorArea" class="check-row"><input id="mSimulator" type="checkbox" ${m.is_simulator ? "checked" : ""}><label for="mSimulator">Exibir na área de simulados deste concurso</label></div><button class="btn primary">Salvar</button></form>`);
-    const sync = () => { $("fileArea").classList.toggle("hidden", $("mType").value === "video"); $("urlArea").classList.toggle("hidden", $("mType").value !== "video"); $("simulatorArea").classList.toggle("hidden", $("mType").value !== "quiz"); };
+
+    const currentSubject = m.subject_id
+        ? subject(m.subject_id)
+        : null;
+
+    const currentDiscipline = currentSubject
+        ? discipline(currentSubject.contest_discipline_id)
+        : null;
+
+    const currentContestId =
+        currentDiscipline?.contest_id || "";
+
+    const currentDisciplineId =
+        currentDiscipline?.id || "";
+
+    modal(
+        id ? "Editar material" : "Novo material",
+        `
+        <form id="mForm" class="form">
+
+            <label>Concurso</label>
+
+            <select id="mContest" required>
+
+                <option value="">
+                    Selecione o concurso
+                </option>
+
+                ${cache.contests.map(c =>
+                    `<option
+                        value="${c.id}"
+                        ${c.id === currentContestId ? "selected" : ""}
+                    >
+                        ${esc(c.title)}
+                    </option>`
+                ).join("")}
+
+            </select>
+
+
+            <label>Disciplina</label>
+
+            <select id="mDiscipline" required>
+                <option value="">
+                    Selecione primeiro o concurso
+                </option>
+            </select>
+
+
+            <label>Matéria</label>
+
+            <select id="mSubject" required>
+                <option value="">
+                    Selecione primeiro a disciplina
+                </option>
+            </select>
+
+
+            <div class="form-row">
+
+                <div>
+
+                    <label>Tipo</label>
+
+                    <select id="mType">
+
+                        <option
+                            value="pdf"
+                            ${m.type === "pdf" ? "selected" : ""}
+                        >
+                            PDF
+                        </option>
+
+                        <option
+                            value="html"
+                            ${m.type === "html" ? "selected" : ""}
+                        >
+                            Material HTML
+                        </option>
+
+                        <option
+                            value="video"
+                            ${m.type === "video" ? "selected" : ""}
+                        >
+                            Vídeo
+                        </option>
+
+                        <option
+                            value="quiz"
+                            ${m.type === "quiz" ? "selected" : ""}
+                        >
+                            Questões HTML
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div>
+
+                    <label>Ordem</label>
+
+                    <input
+                        id="mPos"
+                        type="number"
+                        value="${m.position ?? 0}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <label>Título</label>
+
+            <input
+                id="mTitle"
+                required
+                value="${esc(m.title || "")}"
+            >
+
+
+            <label>Descrição</label>
+
+            <textarea id="mDesc">${esc(m.description || "")}</textarea>
+
+
+            <div id="fileArea">
+
+                <label>Arquivo</label>
+
+                <input
+                    id="mFile"
+                    type="file"
+                    accept=".pdf,.html,.htm"
+                >
+
+            </div>
+
+
+            <div id="urlArea">
+
+                <label>Link externo</label>
+
+                <input
+                    id="mUrl"
+                    type="url"
+                    value="${esc(m.external_url || "")}"
+                >
+
+            </div>
+
+
+            <div
+                id="simulatorArea"
+                class="check-row"
+            >
+
+                <input
+                    id="mSimulator"
+                    type="checkbox"
+                    ${m.is_simulator ? "checked" : ""}
+                >
+
+                <label for="mSimulator">
+                    Exibir na área de simulados deste concurso
+                </label>
+
+            </div>
+
+
+            <button class="btn primary">
+                Salvar
+            </button>
+
+        </form>
+        `
+    );
+
+
+    const loadDisciplines = () => {
+
+        const contestId = $("mContest").value;
+
+        const filtered = cache.disciplines.filter(
+            d => d.contest_id === contestId
+        );
+
+        $("mDiscipline").innerHTML =
+            `<option value="">Selecione a disciplina</option>` +
+            filtered.map(d =>
+                `<option
+                    value="${d.id}"
+                    ${d.id === currentDisciplineId ? "selected" : ""}
+                >
+                    ${esc(d.name)}
+                </option>`
+            ).join("");
+    };
+
+
+    const loadSubjects = () => {
+
+        const disciplineId =
+            $("mDiscipline").value;
+
+        const filtered = cache.subjects.filter(
+            s => s.contest_discipline_id === disciplineId
+        );
+
+        $("mSubject").innerHTML =
+            `<option value="">Selecione a matéria</option>` +
+            filtered.map(s =>
+                `<option
+                    value="${s.id}"
+                    ${s.id === m.subject_id ? "selected" : ""}
+                >
+                    ${esc(s.name)}
+                </option>`
+            ).join("");
+    };
+
+
+    $("mContest").onchange = () => {
+
+        loadDisciplines();
+
+        $("mSubject").innerHTML =
+            `<option value="">Selecione primeiro a disciplina</option>`;
+    };
+
+
+    $("mDiscipline").onchange =
+        loadSubjects;
+
+
+    loadDisciplines();
+
+    if (currentDisciplineId) {
+        $("mDiscipline").value =
+            currentDisciplineId;
+
+        loadSubjects();
+    }
+
+
+    const sync = () => {
+
+        $("fileArea").classList.toggle(
+            "hidden",
+            $("mType").value === "video"
+        );
+
+        $("urlArea").classList.toggle(
+            "hidden",
+            $("mType").value !== "video"
+        );
+
+        $("simulatorArea").classList.toggle(
+            "hidden",
+            $("mType").value !== "quiz"
+        );
+    };
+
+
     $("mType").onchange = sync;
+
     sync();
+
+
     $("mForm").onsubmit = async e => {
+
         e.preventDefault();
+
         const type = $("mType").value;
-        let path = m.type === type ? m.storage_path : null, url = type === "video" ? $("mUrl").value.trim() : null;
-        const f = $("mFile").files[0];
+
+        let path =
+            m.type === type
+                ? m.storage_path
+                : null;
+
+        let url =
+            type === "video"
+                ? $("mUrl").value.trim()
+                : null;
+
+        const f =
+            $("mFile").files[0];
+
+
         if (type !== "video" && f) {
-            const np = `${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`, ct = type === "pdf" ? "application/pdf" : "text/html; charset=utf-8";
-            const { error } = await supabase.storage.from("materials").upload(np, f, { contentType: ct });
-            if (error) return toast(error.message, "error");
-            if (m.storage_path) await supabase.storage.from("materials").remove([m.storage_path]);
+
+            const np =
+                `${Date.now()}-${f.name.replace(
+                    /[^a-zA-Z0-9._-]/g,
+                    "_"
+                )}`;
+
+            const ct =
+                type === "pdf"
+                    ? "application/pdf"
+                    : "text/html; charset=utf-8";
+
+            const { error } =
+                await supabase.storage
+                    .from("materials")
+                    .upload(
+                        np,
+                        f,
+                        { contentType: ct }
+                    );
+
+            if (error) {
+                return toast(
+                    error.message,
+                    "error"
+                );
+            }
+
+            if (m.storage_path) {
+                await supabase.storage
+                    .from("materials")
+                    .remove([
+                        m.storage_path
+                    ]);
+            }
+
             path = np;
         }
-        if (type !== "video" && !path) return toast("Selecione o arquivo.", "error");
-        const p = { subject_id: $("mSubject").value, type, title: $("mTitle").value.trim(), description: $("mDesc").value.trim(), storage_path: path, external_url: url, position: Number($("mPos").value || 0), is_published: true, is_simulator: type === "quiz" && $("mSimulator").checked };
-        const q = id ? supabase.from("materials").update(p).eq("id", id) : supabase.from("materials").insert(p);
+
+
+        if (type !== "video" && !path) {
+            return toast(
+                "Selecione o arquivo.",
+                "error"
+            );
+        }
+
+
+        const p = {
+
+            subject_id:
+                $("mSubject").value,
+
+            type,
+
+            title:
+                $("mTitle").value.trim(),
+
+            description:
+                $("mDesc").value.trim(),
+
+            storage_path: path,
+
+            external_url: url,
+
+            position:
+                Number(
+                    $("mPos").value || 0
+                ),
+
+            is_published: true,
+
+            is_simulator:
+                type === "quiz" &&
+                $("mSimulator").checked
+        };
+
+
+        const q = id
+
+            ? supabase
+                .from("materials")
+                .update(p)
+                .eq("id", id)
+
+            : supabase
+                .from("materials")
+                .insert(p);
+
+
         const { error } = await q;
-        if (error) return toast(error.message, "error");
+
+
+        if (error) {
+
+            return toast(
+                error.message,
+                "error"
+            );
+
+        }
+
+
         closeModal();
+
         await loadAdmin();
+
         renderAdmin();
-        toast("Material salvo.", "success");
+
+        toast(
+            "Material salvo.",
+            "success"
+        );
     };
 };
-
 window.editFreeQuiz = id => {
     const q = cache.freeQuizzes.find(x => x.id === id) || {};
     modal(id ? "Editar questões grátis" : "Adicionar questões grátis", `<form id="fqForm" class="form"><div class="form-row"><div><label>Data de publicação</label><input id="fqDate" type="date" required value="${q.publish_date || localISODate()}"></div><div><label>Status</label><select id="fqPublished"><option value="true" ${q.is_published !== false ? "selected" : ""}>Publicado</option><option value="false" ${q.is_published === false ? "selected" : ""}>Oculto</option></select></div></div><label>Título</label><input id="fqTitle" required value="${esc(q.title || "10 questões gratuitas do dia")}"><label>Descrição</label><textarea id="fqDesc">${esc(q.description || "")}</textarea><label>Arquivo HTML ${id ? "(deixe vazio para manter o atual)" : ""}</label><input id="fqFile" type="file" accept=".html,text/html" ${id ? "" : "required"}><p class="help">Use o mesmo arquivo .html interativo que você usa nas matérias do concurso.</p><button class="btn primary">Salvar e publicar</button></form>`);
